@@ -1,4 +1,4 @@
-# 🔐 LLM-Security-Lab
+# 🔐 LLM-Security-Lab-PILOT
 
 > Experimenting with open-source LLMs and tools to build AI-assisted cybersecurity workflows — fully self-hostable, no external API required.
 
