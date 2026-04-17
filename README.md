@@ -1,4 +1,4 @@
-# 🔐 llm-security-lab
+# 🔐 LLM-Security-Lab
 
 > Experimenting with open-source LLMs and tools to build AI-assisted cybersecurity workflows — fully self-hostable, no external API required.
 
@@ -16,12 +16,9 @@
 - [Tools & LLMs](#tools--llms)
 - [Tech Stack](#tech-stack)
 - [Use Cases](#use-cases)
-  - [01 — Intelligent log triage & alert summarization](#01--intelligent-log-triage--alert-summarization)
-  - [02 — ATT&CK-mapped threat hunt assistant](#02--attck-mapped-threat-hunt-assistant)
-  - [03 — Vulnerability report explainer](#03--vulnerability-report-explainer)
-  - [04 — Phishing email classifier](#04--phishing-email-classifier)
-  - [05 — Sigma rule generator from natural language](#05--sigma-rule-generator-from-natural-language)
-  - [06 — LLM-augmented code vulnerability scanner](#06--llm-augmented-code-vulnerability-scanner)
+  
+  - [01 — ATT&CK-mapped threat hunt assistant](#02--attck-mapped-threat-hunt-assistant)
+
 - [Repository Structure](#repository-structure)
 - [Getting Started](#getting-started)
 - [Roadmap](#roadmap)
@@ -33,20 +30,15 @@
 
 ## About
 
-**llm-security-lab** is a research sandbox for exploring how open-source large language models and established security tooling can be combined into practical, AI-assisted security workflows.
+**LLM-Security-Lab** is a research sandbox for exploring how open-source large language models and established security tooling can be combined into practical, AI-assisted security workflows.Framework, KPIs and EVALS are on high focus in this lab.
 
-The goal is not to replace analysts — it's to explore where LLMs can reduce toil, surface context faster, and help teams scale detection, response, and analysis capabilities without relying on closed, cloud-hosted AI services.
-
-Every component in this repo is open-source and self-hostable. Sensitive security data never leaves your environment.
+Every component in this repo is open-source and self-hostable. 
 
 ---
 
 ## Goals
 
-- Demonstrate practical LLM integration patterns for blue team and security engineering use cases
 - Provide working, reproducible example pipelines using open models (Llama 3, Mistral, CodeLlama, Phi-3)
-- Bridge the gap between security tooling (SIEMs, scanners, CTI platforms) and modern LLM orchestration frameworks
-- Serve as a reference for security teams evaluating AI-assisted workflows
 
 ---
 
@@ -107,40 +99,11 @@ Every component in this repo is open-source and self-hostable. Sensitive securit
 
 ---
 
-## Use Cases
+## Use Case
 
----
 
-### 01 — Intelligent log triage & alert summarization
 
-**The problem:** Modern SIEMs generate thousands of alerts daily. Most are noise. Analysts spend hours manually triaging before any real investigation begins.
-
-**The approach:** Pipe Wazuh or Suricata alert JSON into a local LLM to auto-summarize events, group related alerts, classify by severity, and produce a human-readable incident digest — all on-premise.
-
-**Tools:** Ollama · Llama 3 · Wazuh · LangChain · Python
-
-**Example pipeline:**
-```
-Wazuh alert feed (JSON)
-    → LangChain document loader
-    → Llama 3 (summarize + classify)
-    → Structured incident digest (Markdown / JSON)
-```
-
-**Sample prompt pattern:**
-```
-You are a security analyst. Given the following SIEM alerts, summarize what happened,
-identify the most critical events, and assign a severity level (low/medium/high/critical).
-
-Alerts:
-{alerts_json}
-```
-
-**Getting started:** See [`/use-cases/01-log-triage/`](./use-cases/01-log-triage/)
-
----
-
-### 02 — ATT&CK-mapped threat hunt assistant
+### 01 — ATT&CK-mapped threat hunt assistant
 
 **The problem:** Turning raw observables into mapped TTPs requires deep familiarity with MITRE ATT&CK — expertise that's hard to scale.
 
@@ -161,115 +124,6 @@ ATT&CK STIX bundle (JSON)
 
 ---
 
-### 03 — Vulnerability report explainer
-
-**The problem:** CVE descriptions are terse and technical. Translating them into business risk or actionable remediation steps takes time and experience.
-
-**The approach:** Feed CVE details from NVD or Nuclei scan output into an LLM to generate plain-language impact summaries, exploitation context, CVSS score interpretation, and stack-specific remediation guidance.
-
-**Tools:** Nuclei · NVD API · LangChain · GPT4All · Python
-
-**Example output for a given CVE:**
-```
-CVE-2024-XXXXX — Critical (CVSS 9.8)
-
-Plain-language summary: This vulnerability allows an unauthenticated attacker to
-execute arbitrary code on affected Apache servers via a malformed HTTP request header.
-
-Affected versions: Apache HTTP Server 2.4.0 – 2.4.55
-Exploitation likelihood: High — public PoC exists
-Recommended fix: Upgrade to 2.4.56 immediately. Apply WAF rule to block...
-```
-
-**Getting started:** See [`/use-cases/03-vuln-explainer/`](./use-cases/03-vuln-explainer/)
-
----
-
-### 04 — Phishing email classifier
-
-**The problem:** Email-based threats remain the most common initial access vector. Automated classification is often rule-based and misses novel patterns.
-
-**The approach:** Prompt-engineer or fine-tune a local LLM to analyze email headers, body content, and metadata for phishing indicators. Output structured verdicts with reasoning chains — keeping all email data on-premise.
-
-**Tools:** Ollama · Phi-3 · Python · Open phishing datasets (PhishTank, CISA feeds)
-
-**Verdict schema:**
-```json
-{
-  "verdict": "phishing",
-  "confidence": 0.94,
-  "indicators": [
-    "sender domain registered 2 days ago",
-    "urgency language detected",
-    "mismatched display name vs envelope-from",
-    "link redirects to lookalike domain"
-  ],
-  "reasoning": "..."
-}
-```
-
-**Getting started:** See [`/use-cases/04-phishing-classifier/`](./use-cases/04-phishing-classifier/)
-
----
-
-### 05 — Sigma rule generator from natural language
-
-**The problem:** Writing Sigma detection rules requires knowledge of the Sigma schema, log field names, and correct condition syntax — a barrier for many analysts.
-
-**The approach:** Describe a suspicious behavior in plain English and have an LLM generate a syntactically valid Sigma rule, ready to compile and deploy to your SIEM.
-
-**Tools:** Mistral · Sigma · LangChain · Wazuh · Python
-
-**Example:**
-
-Input:
-```
-Detect lateral movement where cmd.exe is spawned by a remote service (services.exe)
-and connects outbound to a non-standard port.
-```
-
-Output:
-```yaml
-title: Suspicious cmd.exe spawned by services.exe with outbound connection
-status: experimental
-logsource:
-    category: process_creation
-    product: windows
-detection:
-    selection:
-        ParentImage|endswith: '\services.exe'
-        Image|endswith: '\cmd.exe'
-    condition: selection
-level: high
-tags:
-    - attack.lateral_movement
-    - attack.t1021
-```
-
-**Getting started:** See [`/use-cases/05-sigma-generator/`](./use-cases/05-sigma-generator/)
-
----
-
-### 06 — LLM-augmented code vulnerability scanner
-
-**The problem:** Static analysis tools (SAST) produce many findings with limited context — developers need to understand exploitability and fix guidance, not just line numbers.
-
-**The approach:** Run Semgrep to identify flagged code patterns, then pass each finding with surrounding code context to a local LLM for deep reasoning: Is this actually exploitable? What's the attack vector? What's the minimal fix?
-
-**Tools:** Semgrep · CodeLlama · Python · LangChain
-
-**Example pipeline:**
-```
-Source code repository
-    → Semgrep scan (structured JSON findings)
-    → Per-finding: code snippet + rule metadata → CodeLlama
-    → Enriched report: exploitability, attack vector, fix suggestion
-```
-
-**Getting started:** See [`/use-cases/06-code-vuln-scanner/`](./use-cases/06-code-vuln-scanner/)
-
----
-
 ## Repository Structure
 
 ```
@@ -280,26 +134,10 @@ llm-security-lab/
 ├── docker-compose.yml            # Spin up Ollama + ChromaDB + Wazuh stack
 │
 ├── use-cases/
-│   ├── 01-log-triage/
-│   │   ├── README.md
-│   │   ├── triage_pipeline.py
-│   │   └── sample_alerts.json
-│   ├── 02-attck-rag/
+│   ├── 01-attck-rag/
 │   │   ├── README.md
 │   │   ├── ingest_attck.py
 │   │   └── query_attck.py
-│   ├── 03-vuln-explainer/
-│   │   ├── README.md
-│   │   └── explain_cve.py
-│   ├── 04-phishing-classifier/
-│   │   ├── README.md
-│   │   └── classify_email.py
-│   ├── 05-sigma-generator/
-│   │   ├── README.md
-│   │   └── generate_sigma.py
-│   └── 06-code-vuln-scanner/
-│       ├── README.md
-│       └── scan_and_enrich.py
 │
 ├── shared/
 │   ├── llm_client.py             # Ollama wrapper
