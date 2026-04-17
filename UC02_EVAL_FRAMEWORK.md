@@ -1,4 +1,4 @@
-# 🎯 Use Case 02 — ATT&CK-Mapped Threat Hunt Assistant
+# 🎯 Use Case 01 — ATT&CK-Mapped Threat Hunt Assistant
 ## Evaluation Framework, KPIs & Evals
 
 > A standalone reference for measuring the quality, reliability, and operational usefulness of the agentic RAG pipeline that maps natural-language threat hunt queries to MITRE ATT&CK techniques.
