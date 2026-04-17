@@ -119,9 +119,6 @@ ATT&CK STIX bundle (JSON)
     → Semantic search → Mistral (reasoning + context)
     → Response: technique IDs, descriptions, detection hints
 ```
-
-**Getting started:** See [`/use-cases/02-attck-rag/`](./use-cases/02-attck-rag/)
-
 ---
 
 ## Repository Structure
